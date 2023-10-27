@@ -1,53 +1,40 @@
-/* COPY INPUT VALUES TO CARD MOCKUP */
-const bounds = document.querySelectorAll("[data-bound]");
-
-for (let i = 0; i < bounds.length; i++) {
-  const targetId = bounds[i].getAttribute("data-bound");
-  const defValue = bounds[i].getAttribute("data-def");
-  const targetEl = document.getElementById(targetId);
-  bounds[i].addEventListener(
-    "blur",
-    () => (targetEl.innerText = bounds[i].value || defValue)
-  );
-}
-
-/* TOGGLE CVC DISPLAY MODE */
-const cvc_toggler = document.getElementById("cvc_toggler");
-
-cvc_toggler.addEventListener("click", () => {
-  const target = cvc_toggler.getAttribute("data-target");
-  const el = document.getElementById(target);
-  el.setAttribute("type", el.type === "text" ? "password" : "text");
-});
-
-function onlyNumberKey(evt) {
-  // Only ASCII character in that range allowed
-  var ASCIICode = evt.which ? evt.which : evt.keyCode;
-  if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57)) return false;
-  return true;
-}
-
 $(function () {
-  $("#cardNumber").on("keyup", function (e) {
-    var val = $(this).val();
-    var newval = "";
-    val = val.replace(/\s/g, "");
-    for (var i = 0; i < val.length; i++) {
-      if (i % 4 == 0 && i > 0) newval = newval.concat(" ");
-      newval = newval.concat(val[i]);
-    }
-    $(this).val(newval);
-  });
+  function playAnimation() {
+    var bg = $("#bg"),
+      bgNum = 0;
+    document.getElementById("audio").play();
+    const marvelInterval = setInterval(function () {
+      bgNum = (bgNum % 20) + 1;
+      bg.css(
+        "background-image",
+        `url(https://himalayasingh.github.io/marvel/img/img-${bgNum}.jpg)`
+      );
+    }, 100);
 
-  $(".year-own").datepicker({
-    minViewMode: 2,
-    format: "yyyy"
-  });
+    setTimeout(function () {
+      clearInterval(marvelInterval);
+    }, 12000);
+  }
 
-  $(".month-own").datepicker({
-    format: "MM",
-    minViewMode: "months",
-    maxViewMode: "months",
-    startView: "months"
+  function initPlay() {
+    $("#loader img").fadeOut(100);
+    $("#a").html("▶<b>PLAY ANIMATION (turn ON sound)</b>").addClass("cursor");
+    $("#a").on("click", function () {
+      $("#loader").fadeOut(100);
+      playAnimation();
+    });
+  }
+
+  $("#hidden").imagesLoaded({ background: true }, function () {
+    setTimeout(function () {
+      var audio = document.getElementById("audio");
+      audio.oncanplay = function () {
+        initPlay();
+      };
+
+      if (audio.readyState > 3) {
+        initPlay();
+      }
+    }, 1000);
   });
 });
